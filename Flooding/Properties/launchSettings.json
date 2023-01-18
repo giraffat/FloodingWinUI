@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Flooding (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Flooding (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
