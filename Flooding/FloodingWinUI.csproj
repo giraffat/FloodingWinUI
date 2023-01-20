@@ -14,26 +14,26 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     </PropertyGroup>
     <ItemGroup>
-        <None Remove="BlankWindow1.xaml"/>
+        <None Remove="BlankWindow1.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Assets\SplashScreen.scale-200.png"/>
-        <Content Include="Assets\LockScreenLogo.scale-200.png"/>
-        <Content Include="Assets\Square150x150Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png"/>
-        <Content Include="Assets\StoreLogo.png"/>
-        <Content Include="Assets\Wide310x150Logo.scale-200.png"/>
+        <Content Include="Assets\SplashScreen.scale-200.png" />
+        <Content Include="Assets\LockScreenLogo.scale-200.png" />
+        <Content Include="Assets\Square150x150Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.scale-200.png" />
+        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+        <Content Include="Assets\StoreLogo.png" />
+        <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0"/>
-        <PackageReference Include="Drastic.MicaAcrylicWindows" Version="1.1.0"/>
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1"/>
-        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25276-preview"/>
-        <PackageReference Include="WinUIEx" Version="2.1.0"/>
-        <Manifest Include="$(ApplicationManifest)"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+        <PackageReference Include="Drastic.MicaAcrylicWindows" Version="1.1.0" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25276-preview" />
+        <PackageReference Include="WinUIEx" Version="2.1.0" />
+        <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>
 
     <!-- 
@@ -42,7 +42,7 @@
       package has not yet been restored.
     -->
     <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-        <ProjectCapability Include="Msix"/>
+        <ProjectCapability Include="Msix" />
     </ItemGroup>
     <ItemGroup>
         <Page Update="BlankWindow1.xaml">
@@ -50,7 +50,7 @@
         </Page>
     </ItemGroup>
     <ItemGroup>
-        <Compile Update="MainWindowModel.cs">
+        <Compile Update="FloodHelper.cs">
             <DependentUpon>MainWindow.xaml</DependentUpon>
         </Compile>
         <Compile Update="MainWindowViewmodel.cs">

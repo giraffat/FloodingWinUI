@@ -39,7 +39,8 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0">Github</Button>
-            <Button Grid.Column="1" HorizontalAlignment="Stretch" Style="{ThemeResource AccentButtonStyle}">启动</Button>
+            <Button Grid.Column="1" HorizontalAlignment="Stretch" Style="{ThemeResource AccentButtonStyle}"
+                    Click="{x:Bind ActionButtonClick}" Content="{x:Bind ButtonText, Mode=OneWay}" />
         </Grid>
     </Grid>
 </drastic:MicaWindow>
