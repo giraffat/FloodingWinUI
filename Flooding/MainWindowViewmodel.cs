@@ -22,7 +22,7 @@ public partial class MainWindowViewmodel : ObservableObject
     }
 
     private bool _isFlooding;
-    
+
     public bool IsFlooding
     {
         get => _isFlooding;
@@ -34,31 +34,33 @@ public partial class MainWindowViewmodel : ObservableObject
         }
     }
 
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly CancellationToken _cancellationToken;
-
-    public MainWindowViewmodel()
-    {
-        _cancellationToken = _cancellationTokenSource.Token;
-    }
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     [RelayCommand(CanExecute = nameof(CanBeginFlood))]
-    private void BeginFlood()
+    private async void BeginFlood()
     {
         IsFlooding = true;
 
-        Task.Run(() =>
+        try
         {
-            Thread.Sleep(2000);
-            
-            for (var i = 0; i < FloodTimes; i++)
+            await Task.Run(async () =>
             {
-                FloodHelper.InjectMessage(FloodText, new[] {VirtualKey.Menu, VirtualKey.S});
-                Progress = i / FloodTimes * 100;
-                _cancellationToken.ThrowIfCancellationRequested();
-                Thread.Sleep(FloodingInterval);
-            }
-        }, _cancellationToken);
+                await Task.Delay(2000);
+
+                for (var i = 0; i < FloodTimes; i++)
+                {
+                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                    SendKeys.SendKeys.SendWait(FloodText + "%S");
+                    Progress = i / FloodTimes * 100;
+                    await Task.Delay(FloodingInterval);
+                }
+            }, _cancellationTokenSource.Token);
+        } 
+        finally
+        {
+            IsFlooding = false;
+            Progress = 0;
+        }
     }
 
     private bool CanBeginFlood() => !IsFlooding;
@@ -67,7 +69,7 @@ public partial class MainWindowViewmodel : ObservableObject
     private void StopFlooding()
     {
         _cancellationTokenSource.Cancel();
-        IsFlooding = false;
+        _cancellationTokenSource = new();
     }
 
     private bool CanStopFlooding() => IsFlooding;

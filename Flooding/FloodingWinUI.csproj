@@ -9,13 +9,9 @@
         <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
         <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
         <UseWinUI>true</UseWinUI>
-        <!--<UseWpf>true</UseWpf>-->
         <EnableMsixTooling>true</EnableMsixTooling>
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     </PropertyGroup>
-    <ItemGroup>
-        <None Remove="BlankWindow1.xaml" />
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -45,14 +41,10 @@
         <ProjectCapability Include="Msix" />
     </ItemGroup>
     <ItemGroup>
-        <Page Update="BlankWindow1.xaml">
-            <Generator>MSBuild:Compile</Generator>
-        </Page>
+      <ProjectReference Include="..\SendKeys\SendKeys.csproj" />
     </ItemGroup>
+
     <ItemGroup>
-        <Compile Update="FloodHelper.cs">
-            <DependentUpon>MainWindow.xaml</DependentUpon>
-        </Compile>
         <Compile Update="MainWindowViewmodel.cs">
             <DependentUpon>MainWindow.xaml</DependentUpon>
         </Compile>
