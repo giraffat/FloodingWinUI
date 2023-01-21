@@ -9,12 +9,12 @@ namespace Flooding;
 public partial class MainWindowViewmodel : ObservableObject
 {
     private CancellationTokenSource _cancellationTokenSource = new();
-    [ObservableProperty] private int _floodingInterval;
+    [ObservableProperty] private int _floodingInterval = 1000;
     [ObservableProperty] private string _floodText;
-    [ObservableProperty] private double _floodTimes;
+    [ObservableProperty] private double _floodTimes = 10;
 
     private bool _isFlooding;
-    [ObservableProperty] private bool _isFloodingTimesLimited;
+    [ObservableProperty] private bool _isFloodingUnlimited;
 
     private double _progress;
 
@@ -45,6 +45,16 @@ public partial class MainWindowViewmodel : ObservableObject
         {
             await Task.Delay(2000, token);
 
+            if (IsFloodingUnlimited)
+            {
+                while (true)
+                {
+                    token.ThrowIfCancellationRequested();
+                    SendKeys.SendKeys.SendWait(FloodText + "%S");
+                    await Task.Delay(FloodingInterval, token);
+                }
+            }
+
             for (var i = 0; i < FloodTimes; i++)
             {
                 token.ThrowIfCancellationRequested();
@@ -55,7 +65,6 @@ public partial class MainWindowViewmodel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-
         }
         finally
         {

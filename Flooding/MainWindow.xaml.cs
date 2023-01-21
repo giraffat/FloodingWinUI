@@ -5,7 +5,9 @@ using WinUIEx;
 namespace Flooding;
 
 [ObservableObject]
-internal sealed partial class MainWindow
+#pragma warning disable MVVMTK0033
+public sealed partial class MainWindow
+#pragma warning restore MVVMTK0033
 {
     private readonly MainWindowViewmodel _viewmodel = new();
 
@@ -28,15 +30,32 @@ internal sealed partial class MainWindow
                 case nameof(_viewmodel.IsFlooding):
                     OnPropertyChanged(nameof(MasterButtonText));
                     OnPropertyChanged(nameof(MasterButtonCommand));
+                    
+                    OnPropertyChanged(nameof(IsFloodTimesNumberBoxEnabled));
+                    OnPropertyChanged(nameof(IsFloodingIntervalNumberBoxEnabled));
+                    OnPropertyChanged(nameof(IsFloodTextTextBoxEnabled));
+                    OnPropertyChanged(nameof(IsFloodingUnlimitedCheckBoxEnabled));
+                    OnPropertyChanged(nameof(IsProgressBarIndeterminate));
+
                     break;
-                case nameof(_viewmodel.IsFloodingTimesLimited):
-                    OnPropertyChanged(nameof(IsFloodingTimesNumberBoxEnabled));
+                case nameof(_viewmodel.IsFloodingUnlimited):
+                    OnPropertyChanged(nameof(IsFloodTimesNumberBoxEnabled));
+                    OnPropertyChanged(nameof(IsProgressBarIndeterminate));
+
                     break;
             }
         };
     }
 
-    private bool IsFloodingTimesNumberBoxEnabled => !_viewmodel.IsFloodingTimesLimited;
+    private bool IsFloodTimesNumberBoxEnabled => !(_viewmodel.IsFloodingUnlimited || _viewmodel.IsFlooding);
+
+    private bool IsFloodingIntervalNumberBoxEnabled => !_viewmodel.IsFlooding;
+
+    private bool IsFloodTextTextBoxEnabled => !_viewmodel.IsFlooding;
+
+    private bool IsFloodingUnlimitedCheckBoxEnabled => !_viewmodel.IsFlooding;
+
+    private bool IsProgressBarIndeterminate => _viewmodel.IsFloodingUnlimited && _viewmodel.IsFlooding;
 
     private string MasterButtonText => _viewmodel.IsFlooding ? "È¡Ïû" : "Æô¶¯";
 
