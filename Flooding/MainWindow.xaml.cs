@@ -1,11 +1,11 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using WinUIEx;
 
 namespace Flooding;
 
-internal sealed partial class MainWindow : INotifyPropertyChanged
+[ObservableObject]
+internal sealed partial class MainWindow
 {
     private readonly MainWindowViewmodel _viewmodel = new();
 
@@ -21,46 +21,25 @@ internal sealed partial class MainWindow : INotifyPropertyChanged
 
         InitializeComponent();
 
-        _viewmodel.PropertyChanged += (_, _) => ButtonText = _viewmodel.IsFlooding ? "取消" : "启动";
-    }
-
-    private bool BoolNegation(bool value)
-    {
-        return !value;
-    }
-
-    private void ActionButtonClick()
-    {
-        if (_viewmodel.IsFlooding)
+        _viewmodel.PropertyChanged += (_, args) =>
         {
-            _viewmodel.Cancel();
-        }
-        else
-        {
-            _viewmodel.BeginFlood();
-        }
+            switch (args.PropertyName)
+            {
+                case nameof(_viewmodel.IsFlooding):
+                    OnPropertyChanged(nameof(MasterButtonText));
+                    OnPropertyChanged(nameof(MasterButtonCommand));
+                    break;
+                case nameof(_viewmodel.IsFloodingTimesLimited):
+                    OnPropertyChanged(nameof(IsFloodingTimesNumberBoxEnabled));
+                    break;
+            }
+        };
     }
 
-    private string _buttonText;
+    private bool IsFloodingTimesNumberBoxEnabled => !_viewmodel.IsFloodingTimesLimited;
 
-    public string ButtonText
-    {
-        get => _buttonText;
-        set => SetField(ref _buttonText, value);
-    }
+    private string MasterButtonText => _viewmodel.IsFlooding ? "取消" : "启动";
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
+    private ICommand MasterButtonCommand =>
+        _viewmodel.IsFlooding ? _viewmodel.StopFloodingCommand : _viewmodel.BeginFloodCommand;
 }

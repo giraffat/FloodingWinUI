@@ -1,78 +1,74 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Flooding;
 
-public class MainWindowViewmodel : ObservableObject
+public partial class MainWindowViewmodel : ObservableObject
 {
-    private double _floodingInterval;
-    private double _floodTimes;
-    private bool _isFloodingTimesLimited;
+    [ObservableProperty] private int _floodingInterval;
+    [ObservableProperty] private double _floodTimes;
+    [ObservableProperty] private bool _isFloodingTimesLimited;
+    [ObservableProperty] private string _floodText;
+
     private double _progress;
-    private string _floodText;
-
-    public double FloodTimes
-    {
-        get => _floodTimes;
-        set => SetProperty(ref _floodTimes, value);
-    }
-
-    public double FloodingInterval
-    {
-        get => _floodingInterval;
-        set => SetProperty(ref _floodingInterval, value);
-    }
-
-    public string FloodText
-    {
-        get => _floodText;
-        set => SetProperty(ref _floodText, value);
-    }
-
-    public bool IsFloodingTimesLimited
-    {
-        get => _isFloodingTimesLimited;
-        set => SetProperty(ref _isFloodingTimesLimited, value);
-    }
 
     public double Progress
     {
         get => _progress;
-        set => SetProperty(ref _progress, value);
-    }
-
-    public bool IsFlooding
-    {
-        get => _isFlooding;
-        set => SetProperty(ref _isFlooding, value);
+        private set => SetProperty(ref _progress, value);
     }
 
     private bool _isFlooding;
     
-    public Action Cancel;
-
-    public void BeginFlood()
+    public bool IsFlooding
     {
-        var cancellationTokenSource = new CancellationTokenSource();
-        var cancellationToken = cancellationTokenSource.Token;
+        get => _isFlooding;
+        private set
+        {
+            SetProperty(ref _isFlooding, value);
+            BeginFloodCommand.NotifyCanExecuteChanged();
+            StopFloodingCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly CancellationToken _cancellationToken;
+
+    public MainWindowViewmodel()
+    {
+        _cancellationToken = _cancellationTokenSource.Token;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanBeginFlood))]
+    private void BeginFlood()
+    {
+        IsFlooding = true;
 
         Task.Run(() =>
         {
+            Thread.Sleep(2000);
+            
             for (var i = 0; i < FloodTimes; i++)
             {
                 FloodHelper.InjectMessage(FloodText, new[] {VirtualKey.Menu, VirtualKey.S});
                 Progress = i / FloodTimes * 100;
-                cancellationToken.ThrowIfCancellationRequested();
+                _cancellationToken.ThrowIfCancellationRequested();
+                Thread.Sleep(FloodingInterval);
             }
-
-            Cancel = () => throw new Exception("已经结束啦");
-            IsFlooding = false;
-        }, cancellationToken);
-        
-        Cancel = cancellationTokenSource.Cancel;
-        IsFlooding = true;
+        }, _cancellationToken);
     }
+
+    private bool CanBeginFlood() => !IsFlooding;
+
+    [RelayCommand(CanExecute = nameof(CanStopFlooding))]
+    private void StopFlooding()
+    {
+        _cancellationTokenSource.Cancel();
+        IsFlooding = false;
+    }
+
+    private bool CanStopFlooding() => IsFlooding;
 }

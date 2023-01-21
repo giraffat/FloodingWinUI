@@ -19,6 +19,11 @@ public static class FloodHelper
                 {
                     ScanCode = character,
                     KeyOptions = InjectedInputKeyOptions.Unicode
+                },
+                new InjectedInputKeyboardInfo
+                {
+                    ScanCode = character,
+                    KeyOptions = InjectedInputKeyOptions.KeyUp
                 }
             });
         }
@@ -31,6 +36,14 @@ public static class FloodHelper
         Injector.InjectKeyboardInput(
             from sendKey in sendKeys
             select new InjectedInputKeyboardInfo {VirtualKey = (ushort) sendKey}
+        );
+        Injector.InjectKeyboardInput(
+            from sendKey in sendKeys
+            select new InjectedInputKeyboardInfo 
+            {
+                VirtualKey = (ushort) sendKey,
+                KeyOptions = InjectedInputKeyOptions.KeyUp
+            }
         );
     }
 }
