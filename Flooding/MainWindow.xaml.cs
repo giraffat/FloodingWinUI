@@ -1,5 +1,7 @@
+using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WinUIEx;
 
 namespace Flooding;
@@ -36,12 +38,13 @@ public sealed partial class MainWindow
                     OnPropertyChanged(nameof(IsFloodTextTextBoxEnabled));
                     OnPropertyChanged(nameof(IsFloodingUnlimitedCheckBoxEnabled));
                     OnPropertyChanged(nameof(IsProgressBarIndeterminate));
-
                     break;
                 case nameof(_viewmodel.IsFloodingUnlimited):
                     OnPropertyChanged(nameof(IsFloodTimesNumberBoxEnabled));
                     OnPropertyChanged(nameof(IsProgressBarIndeterminate));
-
+                    break;
+                case nameof(_viewmodel.FloodText):
+                    OnPropertyChanged(nameof(IsMasterButtonEnabled));
                     break;
             }
         };
@@ -61,4 +64,9 @@ public sealed partial class MainWindow
 
     private ICommand MasterButtonCommand =>
         _viewmodel.IsFlooding ? _viewmodel.StopFloodingCommand : _viewmodel.BeginFloodCommand;
+
+    private bool IsMasterButtonEnabled => _viewmodel.FloodText is not null && _viewmodel.FloodText != string.Empty;
+
+    [RelayCommand]
+    private async void OpenGithub() => await Windows.System.Launcher.LaunchUriAsync(new Uri("https://github.com/giraffat/FloodingWinUI"));
 }
