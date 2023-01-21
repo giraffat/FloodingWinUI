@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -8,10 +8,13 @@ namespace Flooding;
 
 public partial class MainWindowViewmodel : ObservableObject
 {
+    private CancellationTokenSource _cancellationTokenSource = new();
     [ObservableProperty] private int _floodingInterval;
-    [ObservableProperty] private double _floodTimes;
-    [ObservableProperty] private bool _isFloodingTimesLimited;
     [ObservableProperty] private string _floodText;
+    [ObservableProperty] private double _floodTimes;
+
+    private bool _isFlooding;
+    [ObservableProperty] private bool _isFloodingTimesLimited;
 
     private double _progress;
 
@@ -20,8 +23,6 @@ public partial class MainWindowViewmodel : ObservableObject
         get => _progress;
         private set => SetProperty(ref _progress, value);
     }
-
-    private bool _isFlooding;
 
     public bool IsFlooding
     {
@@ -34,28 +35,28 @@ public partial class MainWindowViewmodel : ObservableObject
         }
     }
 
-    private CancellationTokenSource _cancellationTokenSource = new();
-
     [RelayCommand(CanExecute = nameof(CanBeginFlood))]
     private async void BeginFlood()
     {
         IsFlooding = true;
+        var token = _cancellationTokenSource.Token;
 
         try
         {
-            await Task.Run(async () =>
-            {
-                await Task.Delay(2000);
+            await Task.Delay(2000, token);
 
-                for (var i = 0; i < FloodTimes; i++)
-                {
-                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                    SendKeys.SendKeys.SendWait(FloodText + "%S");
-                    Progress = i / FloodTimes * 100;
-                    await Task.Delay(FloodingInterval);
-                }
-            }, _cancellationTokenSource.Token);
-        } 
+            for (var i = 0; i < FloodTimes; i++)
+            {
+                token.ThrowIfCancellationRequested();
+                SendKeys.SendKeys.SendWait(FloodText + "%S");
+                Progress = i / FloodTimes * 100;
+                await Task.Delay(FloodingInterval, token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+
+        }
         finally
         {
             IsFlooding = false;
@@ -63,14 +64,20 @@ public partial class MainWindowViewmodel : ObservableObject
         }
     }
 
-    private bool CanBeginFlood() => !IsFlooding;
+    private bool CanBeginFlood()
+    {
+        return !IsFlooding;
+    }
 
     [RelayCommand(CanExecute = nameof(CanStopFlooding))]
     private void StopFlooding()
     {
         _cancellationTokenSource.Cancel();
-        _cancellationTokenSource = new();
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
-    private bool CanStopFlooding() => IsFlooding;
+    private bool CanStopFlooding()
+    {
+        return IsFlooding;
+    }
 }

@@ -27,10 +27,8 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Auto" Text="{x:Bind _viewmodel.FloodText, Mode=TwoWay}" />
         <CheckBox Grid.Row="3" Margin="0,8,0,0" IsChecked="{x:Bind _viewmodel.IsFloodingTimesLimited, Mode=TwoWay}">无限次数</CheckBox>
 
-        <ProgressBar Grid.Row="4" Margin="0,8,0,0" Background="{ThemeResource SystemBaseLowColor}" Value="{x:Bind _viewmodel.Progress, Mode=OneWay}">
-            <ProgressBar.Resources>
-            </ProgressBar.Resources>
-        </ProgressBar>
+        <ProgressBar Grid.Row="4" Margin="0,8,0,0" Background="{ThemeResource SystemBaseLowColor}"
+                     Value="{x:Bind _viewmodel.Progress, Mode=OneWay}" />
 
         <Grid Grid.Row="5" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
